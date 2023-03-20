@@ -56,6 +56,10 @@ public class App {
             String line;
             int i = 1;
             while ((line = br.readLine()) != null) {
+                if (line.length() != 4 || !line.matches("[a-z]{4}")) {
+                    System.out.println("Skipping " + line);
+                    continue;
+                }
                 System.out.println(line);
                 wordleDatabaseConnection.addValidWord(i, line);
                 i++;
@@ -74,6 +78,14 @@ public class App {
             String guess = scanner.nextLine();
 
             while (!guess.equals("q")) {
+                
+                if (guess.length() != 4 || !guess.matches("[a-z]{4}")) {
+                    System.out.print("Not acceptable input." );
+                    System.out.print("Enter a 4 letter word for a guess or q to quit: " );
+                    guess = scanner.nextLine();
+                    continue;
+                }
+
                 System.out.println("You've guessed '" + guess+"'.");
 
                 if (wordleDatabaseConnection.isValidWord(guess)) { 
