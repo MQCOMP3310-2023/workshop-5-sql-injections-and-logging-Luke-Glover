@@ -127,12 +127,19 @@ public class SQLiteConnectionManager {
      */
     public void addValidWord(int id, String word) {
 
-        String sql = "INSERT INTO validWords(id,word) VALUES('" + id + "','" + word + "')";
+        //String sql = "INSERT INTO validWords(id,word) VALUES('" + id + "','" + word + "')";
+        String sql2 = "INSERT INTO validWords(id, word) VALUES(?,?)";
 
-        try (Connection conn = DriverManager.getConnection(databaseURL);
-                PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
+        try (
+            Connection conn = DriverManager.getConnection(databaseURL);
+            PreparedStatement pstmt = conn.prepareStatement(sql2)) 
+            
+            {
+                pstmt.setInt(1, id);
+                pstmt.setString(2, word);
+                pstmt.executeUpdate();
+        
+            } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
 
@@ -145,18 +152,24 @@ public class SQLiteConnectionManager {
      * @return true if guess exists in the database, false otherwise
      */
     public boolean isValidWord(String guess) {
-        String sql = "SELECT count(id) as total FROM validWords WHERE word like'" + guess + "';";
+        //String sql = "SELECT count(id) as total FROM validWords WHERE word like'" + guess + "';";
+        String sql2 = "SELECT count(id) AS TOTAL FROM validWords WHERE word LIKE ?;";
 
-        try (Connection conn = DriverManager.getConnection(databaseURL);
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (
+            Connection conn = DriverManager.getConnection(databaseURL);
+            PreparedStatement stmt = conn.prepareStatement(sql2)
+            ) 
+            {
 
-            ResultSet resultRows = stmt.executeQuery();
-            if (resultRows.next()) {
-                int result = resultRows.getInt("total");
-                return (result >= 1);
-            }
+                stmt.setString(1, guess);
 
-            return false;
+                ResultSet resultRows = stmt.executeQuery();
+                if (resultRows.next()) {
+                    int result = resultRows.getInt("total");
+                    return (result >= 1);
+                }
+
+                return false;
 
         } catch (SQLException e) {
             System.out.println(e.getMessage());
