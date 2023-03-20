@@ -29,6 +29,7 @@ public class App {
 
     private static final Logger logger = Logger.getLogger(App.class.getName());
     private static final String GENERIC_ERROR_MESSAGE = "Something went wrong. Please try starting the game again.";
+    private static final String USER_PROMPT = "Enter a 4 letter word for a guess or q to quit:";
     // End code for logging exercise
     
     /**
@@ -42,7 +43,7 @@ public class App {
 
         wordleDatabaseConnection.createNewDatabase("words.db");
         if (!wordleDatabaseConnection.checkIfConnectionDefined()) {
-            logger.log(Level.SEVERE, "Something went connection to databsse");
+            logger.log(Level.SEVERE, "Something went wrong connecting to databsse");
             System.out.println(GENERIC_ERROR_MESSAGE);
             System.exit(-1);
         }
@@ -63,7 +64,7 @@ public class App {
                     logger.log(Level.SEVERE, "Invalid word in data.txt: {}", line);
                     continue;
                 }
-                logger.log(Level.CONFIG, "Addign word: {}", line);
+                logger.log(Level.CONFIG, "Adding word: {}", line);
                 wordleDatabaseConnection.addValidWord(i, line);
                 i++;
             }
@@ -78,14 +79,14 @@ public class App {
 
         try (Scanner scanner = new Scanner(System.in)) {
             System.out.println("Done loading.");
-            System.out.print("Enter a 4 letter word for a guess or q to quit: ");
+            System.out.print(USER_PROMPT);
             String guess = scanner.nextLine();
 
             while (!guess.equals("q")) {
                 
                 if (guess.length() != 4 || !guess.matches("[a-z]{4}")) {
-                    System.out.print("Not acceptable input." );
-                    System.out.print("Enter a 4 letter word for a guess or q to quit: " );
+                    System.out.print("Not acceptable input. " );
+                    System.out.print(USER_PROMPT);
                     guess = scanner.nextLine();
                     continue;
                 }
@@ -99,11 +100,11 @@ public class App {
                     logger.log(Level.INFO, "Incorrect guess: {}", guess);
                 }
 
-                System.out.print("Enter a 4 letter word for a guess or q to quit: " );
+                System.out.print(USER_PROMPT);
                 guess = scanner.nextLine();
             }
         } catch (NoSuchElementException | IllegalStateException e) {
-            logger.log(Level.SEVERE, "Exception in maing game loop.", e);
+            logger.log(Level.SEVERE, "Exception in main game loop.", e);
             System.out.println("Something went wrong. Please try starting the game again.");
             System.exit(-1);
         }
