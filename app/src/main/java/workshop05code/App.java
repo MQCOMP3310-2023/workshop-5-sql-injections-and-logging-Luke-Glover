@@ -16,6 +16,10 @@ import java.util.logging.Logger;
  * @author sqlitetutorial.net
  */
 public class App {
+
+    private static final String GENERIC_ERROR_MESSAGE = "Something went wrong. Please try starting the game again.";
+    private static final String USER_PROMPT = "Enter a 4 letter word for a guess or q to quit:";
+
     // Start code for logging exercise
     static {
         // must set before the Logger
@@ -23,13 +27,12 @@ public class App {
         try {// resources\logging.properties
             LogManager.getLogManager().readConfiguration(new FileInputStream("resources/logging.properties"));
         } catch (SecurityException | IOException e1) {
-            e1.printStackTrace();
+            System.out.println(GENERIC_ERROR_MESSAGE);
+            System.exit(-1);
         }
     }
 
     private static final Logger logger = Logger.getLogger(App.class.getName());
-    private static final String GENERIC_ERROR_MESSAGE = "Something went wrong. Please try starting the game again.";
-    private static final String USER_PROMPT = "Enter a 4 letter word for a guess or q to quit:";
     // End code for logging exercise
     
     /**
@@ -105,7 +108,7 @@ public class App {
             }
         } catch (NoSuchElementException | IllegalStateException e) {
             logger.log(Level.SEVERE, "Exception in main game loop.", e);
-            System.out.println("Something went wrong. Please try starting the game again.");
+            System.out.println(GENERIC_ERROR_MESSAGE);
             System.exit(-1);
         }
 
