@@ -28,52 +28,56 @@ public class App {
     }
 
     private static final Logger logger = Logger.getLogger(App.class.getName());
+    private static final String GENERIC_ERROR_MESSAGE = "Something went wrong. Please try starting the game again.";
     // End code for logging exercise
     
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+
+        System.out.println("Starting Up...");
+
         SQLiteConnectionManager wordleDatabaseConnection = new SQLiteConnectionManager("words.db");
 
         wordleDatabaseConnection.createNewDatabase("words.db");
-        if (wordleDatabaseConnection.checkIfConnectionDefined()) {
-            System.out.println("Wordle created and connected.");
-        } else {
-            System.out.println("Not able to connect. Sorry!");
-            return;
+        if (!wordleDatabaseConnection.checkIfConnectionDefined()) {
+            logger.log(Level.SEVERE, "Something went connection to databsse");
+            System.out.println(GENERIC_ERROR_MESSAGE);
+            System.exit(-1);
         }
-        if (wordleDatabaseConnection.createWordleTables()) {
-            System.out.println("Wordle structures in place.");
-        } else {
-            System.out.println("Not able to launch. Sorry!");
-            return;
+        if (!wordleDatabaseConnection.createWordleTables()) {
+            logger.log(Level.SEVERE, "Something went wrong creating wordle tables");
+            System.out.println(GENERIC_ERROR_MESSAGE);
+            System.exit(-1);
         }
 
         // let's add some words to valid 4 letter words from the data.txt file
 
         try (BufferedReader br = new BufferedReader(new FileReader("resources/data.txt"))) {
+            System.out.println("Loading word list...");
             String line;
             int i = 1;
             while ((line = br.readLine()) != null) {
                 if (line.length() != 4 || !line.matches("[a-z]{4}")) {
-                    System.out.println("Skipping " + line);
+                    logger.log(Level.SEVERE, "Invalid word in data.txt: {}", line);
                     continue;
                 }
-                System.out.println(line);
+                logger.log(Level.CONFIG, "Addign word: {}", line);
                 wordleDatabaseConnection.addValidWord(i, line);
                 i++;
             }
 
         } catch (IOException e) {
-            System.out.println("Not able to load . Sorry!");
-            System.out.println(e.getMessage());
-            return;
+            logger.log(Level.SEVERE, "Exception while reading word list.", e);
+            System.out.println(GENERIC_ERROR_MESSAGE);
+            System.exit(-1);
         }
 
         // let's get them to enter a word
 
         try (Scanner scanner = new Scanner(System.in)) {
+            System.out.println("Done loading.");
             System.out.print("Enter a 4 letter word for a guess or q to quit: ");
             String guess = scanner.nextLine();
 
@@ -92,13 +96,16 @@ public class App {
                     System.out.println("Success! It is in the the list.\n");
                 }else{
                     System.out.println("Sorry. This word is NOT in the the list.\n");
+                    logger.log(Level.INFO, "Incorrect guess: {}", guess);
                 }
 
                 System.out.print("Enter a 4 letter word for a guess or q to quit: " );
                 guess = scanner.nextLine();
             }
         } catch (NoSuchElementException | IllegalStateException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Exception in maing game loop.", e);
+            System.out.println("Something went wrong. Please try starting the game again.");
+            System.exit(-1);
         }
 
     }

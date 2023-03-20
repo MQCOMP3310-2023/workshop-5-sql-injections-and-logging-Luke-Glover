@@ -24,7 +24,7 @@ public class SQLiteConnectionManager {
         try {// resources\logging.properties
             LogManager.getLogManager().readConfiguration(new FileInputStream("resources/logging.properties"));
         } catch (SecurityException | IOException e1) {
-            e1.printStackTrace();
+           ;
         }
     }
 
@@ -64,12 +64,11 @@ public class SQLiteConnectionManager {
         try (Connection conn = DriverManager.getConnection(databaseURL)) {
             if (conn != null) {
                 DatabaseMetaData meta = conn.getMetaData();
-                System.out.println("The driver name is " + meta.getDriverName());
-                System.out.println("A new database has been created.");
+                logger.log(Level.INFO, "Created new database with driver {}.", meta.getDriverName());
 
             }
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            logger.log(Level.SEVERE, "SQLException while creating database", e);
         }
     }
 
@@ -88,7 +87,7 @@ public class SQLiteConnectionManager {
                     return true;
                 }
             } catch (SQLException e) {
-                System.out.println(e.getMessage());
+                logger.log(Level.SEVERE, "SQLException while checking connection", e);
                 return false;
             }
         }
@@ -113,7 +112,7 @@ public class SQLiteConnectionManager {
                 return true;
 
             } catch (SQLException e) {
-                System.out.println(e.getMessage());
+                logger.log(Level.SEVERE, "SQLException while creating table", e);
                 return false;
             }
         }
@@ -140,8 +139,8 @@ public class SQLiteConnectionManager {
                 pstmt.executeUpdate();
         
             } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
+                logger.log(Level.SEVERE, "SQLException while adding word", e);
+            }
 
     }
 
@@ -172,7 +171,7 @@ public class SQLiteConnectionManager {
                 return false;
 
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            logger.log(Level.SEVERE, "SQLException while testing word", e);
             return false;
         }
 
